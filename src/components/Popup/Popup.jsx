@@ -67,7 +67,6 @@ const Popup = ({
         className={classNames(
           'popup__container',
           isVisible && 'popup__container_visible',
-          props.className,
         )}
         ref={containerRef}
       >
@@ -79,7 +78,12 @@ const Popup = ({
           aria-label="Close"
         />
 
-        <div className="popup__content-container">
+        <div
+          className={classNames(
+            'popup__content-container',
+            props.className,
+          )}
+        >
           {children}
         </div>
       </div>
