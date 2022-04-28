@@ -109,7 +109,7 @@
 .popup__content-container {
   flex-grow: 1;
   padding: 34px 36px 28px;
-  overflow-x: auto;
+  overflow: auto;
 }
 
 @media (max-width: 640px) {
