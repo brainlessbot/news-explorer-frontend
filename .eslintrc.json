@@ -18,5 +18,10 @@
     "react"
   ],
   "rules": {
+    "no-nested-ternary": "off",
+    "react/button-has-type": "off",
+    "react/function-component-definition": "off",
+    "react/jsx-props-no-spreading": "off",
+    "react/prop-types": "off"
   }
 }
