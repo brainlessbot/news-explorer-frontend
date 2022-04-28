@@ -79,7 +79,9 @@ const Popup = ({
           aria-label="Close"
         />
 
-        {children}
+        <div className="popup__content-container">
+          {children}
+        </div>
       </div>
     </div>
   );
