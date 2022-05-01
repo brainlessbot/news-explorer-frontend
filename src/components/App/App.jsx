@@ -358,7 +358,7 @@ const App = () => {
   React.useEffect(() => {
     localStorage.setItem('lastSearch', JSON.stringify(lastSearch));
 
-    if (lastSearch.results.length > 0) {
+    if (lastSearch.query) {
       handleLoadingInitialResults();
     }
   }, [lastSearch]);
