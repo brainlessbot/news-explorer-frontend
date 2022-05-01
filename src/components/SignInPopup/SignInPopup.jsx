@@ -1,6 +1,7 @@
 import React from 'react';
 import PopupWithForm from '../PopupWithForm/PopupWithForm';
 import Button from '../Button/Button';
+import useForm from '../../hooks/form';
 
 /**
  * Sign In Popup component.
@@ -18,26 +19,37 @@ const SignInPopup = ({
   onFormSubmit,
   switchToSignUp,
 }) => {
-  const [emailValue, setEmailValue] = React.useState('name@address.com');
-  const [passwordValue, setPasswordValue] = React.useState('12345678');
+  const {
+    formValues,
+    formErrors,
+    isFormValid,
+    handleInputChange,
+    resetForm,
+  } = useForm();
 
   const [isLoading, setIsLoading] = React.useState(false);
+  const [errorResponse, setErrorResponse] = React.useState(undefined);
 
   /**
-   * Handle email value change.
+   * Handle an error response from the server.
    *
-   * @param {Event} event
+   * @param {Object} error
    * @return {void}
    */
-  const handleEmailChange = (event) => setEmailValue(event.target.value);
+  const handleErrorResponse = (error) => {
+    if (error.validation) {
+      return setErrorResponse(error.validation.body.message);
+    }
+
+    return setErrorResponse(error.message);
+  };
 
   /**
-   * Handle password value change.
+   * Handle any response from the server.
    *
-   * @param {Event} event
    * @return {void}
    */
-  const handlePasswordChange = (event) => setPasswordValue(event.target.value);
+  const handleAnyResponse = () => setIsLoading(false);
 
   /**
    * Handle the submission of the form.
@@ -49,15 +61,19 @@ const SignInPopup = ({
     event.preventDefault();
 
     setIsLoading(true);
-    onFormSubmit({
-      email: emailValue,
-      password: passwordValue,
-    }, () => setIsLoading(false));
+    onFormSubmit(
+      {
+        email: formValues.email,
+        password: formValues.password,
+      },
+      handleErrorResponse,
+      handleAnyResponse,
+    );
   };
 
   React.useEffect(() => {
-    setEmailValue('name@address.com');
-    setPasswordValue('12345678');
+    resetForm();
+    setErrorResponse(undefined);
   }, [isVisible]);
 
   return (
@@ -69,7 +85,11 @@ const SignInPopup = ({
         Sign in
       </h2>
 
-      <form onSubmit={handleFormSubmit}>
+      <form
+        name="signin-form"
+        onSubmit={handleFormSubmit}
+        noValidate
+      >
         <label htmlFor="signin-email" className="popup-with-form__input-group">
           <span className="popup-with-form__input-label">
             Email
@@ -78,14 +98,21 @@ const SignInPopup = ({
           <input
             id="signin-email"
             name="email"
-            value={emailValue}
-            onChange={handleEmailChange}
+            value={formValues.email || ''}
+            onChange={handleInputChange}
             className="popup-with-form__input"
-            type="text"
+            type="email"
             autoComplete="off"
             placeholder="Enter email"
             required
+            disabled={isLoading}
           />
+
+          {formErrors.email && (
+            <p className="popup-with-form__error">
+              {formErrors.email}
+            </p>
+          )}
         </label>
 
         <label htmlFor="signin-password" className="popup-with-form__input-group">
@@ -96,21 +123,35 @@ const SignInPopup = ({
           <input
             id="signin-password"
             name="password"
-            value={passwordValue}
-            onChange={handlePasswordChange}
+            value={formValues.password || ''}
+            onChange={handleInputChange}
             className="popup-with-form__input"
             type="password"
+            minLength="8"
             autoComplete="off"
             placeholder="Enter password"
             required
+            disabled={isLoading}
           />
+
+          {formErrors.password && (
+            <p className="popup-with-form__error">
+              {formErrors.password}
+            </p>
+          )}
         </label>
+
+        {errorResponse && (
+          <p className="popup-with-form__error popup-with-form__error_general">
+            {errorResponse}
+          </p>
+        )}
 
         <Button
           type="submit"
           pattern="primary"
           className="popup-with-form__submit-button"
-          disabled={isLoading}
+          disabled={isLoading || !isFormValid}
         >
           {isLoading ? 'Signing in...' : 'Sign in'}
         </Button>
