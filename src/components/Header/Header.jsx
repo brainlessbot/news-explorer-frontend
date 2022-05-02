@@ -7,11 +7,18 @@ import './Header.css';
  * Header component.
  *
  * @component
+ * @param {Object} lastSearch
+ * @param {Function} onSearchSubmit
  * @param {Function} onSignInClick
  * @param {Function} onSignOutClick
  * @return {React.ReactNode}
  */
-const Header = ({ onSignInClick, onSignOutClick }) => (
+const Header = ({
+  lastSearch,
+  onSearchSubmit,
+  onSignInClick,
+  onSignOutClick,
+}) => (
   <header className="header">
     <Navigation
       onSignInClick={onSignInClick}
@@ -28,7 +35,10 @@ const Header = ({ onSignInClick, onSignOutClick }) => (
         Find the latest news on any topic and save them in your personal account.
       </p>
 
-      <SearchForm />
+      <SearchForm
+        lastSearch={lastSearch}
+        onSearchSubmit={onSearchSubmit}
+      />
     </div>
   </header>
 );

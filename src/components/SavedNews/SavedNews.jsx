@@ -2,43 +2,33 @@ import React from 'react';
 import SavedNewsHeader from '../SavedNewsHeader/SavedNewsHeader';
 import NewsCardList from '../NewsCardList/NewsCardList';
 import Footer from '../Footer/Footer';
-import { savedData } from '../../temp/data';
 
 /**
  * Saved News component.
  *
  * @component
+ * @param {Object} savedArticles
  * @param {Function} onSignOutClick
+ * @param {Function} onRemoveClick
  * @return {React.ReactNode}
  */
-const SavedNews = ({ onSignOutClick }) => {
-  const [newsData, setNewsData] = React.useState([]);
-  const [isLoading, setIsLoading] = React.useState(true);
+const SavedNews = ({ savedArticles, onSignOutClick, onRemoveClick }) => (
+  <>
+    <SavedNewsHeader
+      savedArticles={savedArticles}
+      onSignOutClick={onSignOutClick}
+    />
 
-  // TEMPORARY FOR STAGE II
-  React.useEffect(() => {
-    setTimeout(() => {
-      setNewsData(savedData);
-      setIsLoading(false);
-    }, 1500);
-  }, []);
-
-  return (
-    <>
-      <SavedNewsHeader
-        onSignOutClick={onSignOutClick}
+    <main>
+      <NewsCardList
+        data={savedArticles.data}
+        isLoading={savedArticles.isLoading}
+        onRemoveClick={onRemoveClick}
       />
+    </main>
 
-      <main>
-        <NewsCardList
-          data={newsData}
-          isLoading={isLoading}
-        />
-      </main>
-
-      <Footer />
-    </>
-  );
-};
+    <Footer />
+  </>
+);
 
 export default SavedNews;

@@ -12,8 +12,12 @@ import CurrentUserContext from '../../context/CurrentUserContext';
 const ProtectedRoute = ({ children }) => {
   const currentUser = React.useContext(CurrentUserContext);
 
+  if (currentUser.isLoading || currentUser.isAuthRequired) {
+    return null;
+  }
+
   return currentUser.isLoggedIn ? children : (
-    <Navigate to="/" />
+    <Navigate to="/" state={{ openSignIn: true }} />
   );
 };
 

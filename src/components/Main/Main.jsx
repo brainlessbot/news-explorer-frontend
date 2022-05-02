@@ -3,50 +3,62 @@ import Header from '../Header/Header';
 import NewsCardList from '../NewsCardList/NewsCardList';
 import About from '../About/About';
 import Footer from '../Footer/Footer';
-import { searchData } from '../../temp/data';
 
 /**
  * Main component.
  *
  * @component
+ * @param {Object} lastSearch
+ * @param {Object} savedArticles
+ * @param {Object} shownResults
+ * @param {Function} onSearchSubmit
  * @param {Function} onSignInClick
+ * @param {Function} onSignUpClick
  * @param {Function} onSignOutClick
+ * @param {Function} onBookmarkClick
+ * @param {Function} onRemoveClick
+ * @param {Function} onLoadMoreClick
  * @return {React.ReactNode}
  */
-const Main = ({ onSignInClick, onSignOutClick }) => {
-  const [newsData, setNewsData] = React.useState([]);
-  const [isLoading, setIsLoading] = React.useState(true);
+const Main = ({
+  lastSearch,
+  savedArticles,
+  shownResults,
+  onSearchSubmit,
+  onSignInClick,
+  onSignUpClick,
+  onSignOutClick,
+  onBookmarkClick,
+  onRemoveClick,
+  onLoadMoreClick,
+}) => (
+  <>
+    <Header
+      lastSearch={lastSearch}
+      onSearchSubmit={onSearchSubmit}
+      onSignInClick={onSignInClick}
+      onSignOutClick={onSignOutClick}
+    />
 
-  // TEMPORARY FOR STAGE II
-  React.useEffect(() => {
-    setTimeout(() => {
-      setNewsData(searchData);
-      setIsLoading(false);
-    }, 1500);
-  }, []);
-
-  return (
-    <>
-      <Header
-        onSignInClick={onSignInClick}
-        onSignOutClick={onSignOutClick}
+    <main>
+      <NewsCardList
+        data={shownResults}
+        savedArticles={savedArticles}
+        isVisible={lastSearch.query !== undefined}
+        isLoading={lastSearch.isLoading}
+        isError={lastSearch.isError}
+        isSearchResults
+        onSignUpClick={onSignUpClick}
+        onBookmarkClick={onBookmarkClick}
+        onRemoveClick={onRemoveClick}
+        onLoadMoreClick={onLoadMoreClick}
       />
 
-      <main>
-        <NewsCardList
-          data={newsData}
-          isLoading={isLoading}
-          isSearchResults
-          onSignInClick={onSignInClick}
-          onLoadMoreClick={() => {}}
-        />
+      <About />
+    </main>
 
-        <About />
-      </main>
-
-      <Footer />
-    </>
-  );
-};
+    <Footer />
+  </>
+);
 
 export default Main;

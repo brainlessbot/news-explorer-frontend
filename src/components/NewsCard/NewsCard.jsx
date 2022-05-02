@@ -7,38 +7,67 @@ import './NewsCard.css';
  * News Card component.
  *
  * @component
- * @param {Object} cardData
+ * @param {Object} data
+ * @param {Object} savedArticles
  * @param {boolean} isSearchResults
- * @param {Function} onSignInClick
+ * @param {Function} onSignUpClick
+ * @param {Function} onBookmarkClick
  * @param {Function} onRemoveClick
  * @return {React.ReactNode}
  */
 const NewsCard = ({
-  cardData,
+  data,
+  savedArticles = {},
   isSearchResults = false,
-  onSignInClick = () => {},
+  onSignUpClick = () => {},
+  onBookmarkClick = () => {},
   onRemoveClick = () => {},
 }) => {
   const currentUser = React.useContext(CurrentUserContext);
 
-  const [isBookmarked, setIsBookmarked] = React.useState(false);
+  const [savedArticleId, setSavedArticleId] = React.useState(data._id || undefined);
 
   /**
-   * Toggle bookmark state.
+   * Handle click on the bookmark icon.
    *
    * @return {void}
    */
-  const toggleBookmark = () => setIsBookmarked(!isBookmarked);
+  const handleBookmarkClick = () => onBookmarkClick(data, setSavedArticleId);
+
+  /**
+   * Handle click on the remove icon.
+   *
+   * @return {void}
+   */
+  const handleRemoveClick = () => onRemoveClick(savedArticleId, setSavedArticleId);
+
+  React.useEffect(() => {
+    if (!currentUser.isLoggedIn) {
+      setSavedArticleId(undefined);
+    }
+  }, [currentUser]);
+
+  React.useEffect(() => {
+    if (savedArticles.data && savedArticleId === undefined) {
+      const savedArticle = savedArticles.data.findIndex(
+        (articleData) => articleData.link === data.link,
+      );
+
+      if (savedArticle > -1) {
+        setSavedArticleId(savedArticles.data[savedArticle]._id);
+      }
+    }
+  }, [savedArticles]);
 
   return (
     <li className="news-card">
       <div className="news-card__container">
         <div className="news-card__image-container">
-          <img src={cardData.image} alt={cardData.title} className="news-card__image" />
+          <img src={data.image} alt={data.title} className="news-card__image" />
 
-          {cardData.keyword && (
+          {data.keyword && (
             <p className="news-card__keyword">
-              {cardData.keyword}
+              {data.keyword}
             </p>
           )}
 
@@ -47,14 +76,16 @@ const NewsCard = ({
             onClick={
               isSearchResults
                 ? currentUser.isLoggedIn
-                  ? toggleBookmark
-                  : onSignInClick
-                : onRemoveClick
+                  ? savedArticleId
+                    ? handleRemoveClick
+                    : handleBookmarkClick
+                  : onSignUpClick
+                : handleRemoveClick
             }
             className={classNames(
               'news-card__action-button',
               isSearchResults
-                ? isBookmarked
+                ? savedArticleId
                   ? 'news-card__action-button_type_bookmark-active'
                   : 'news-card__action-button_type_bookmark'
                 : 'news-card__action-button_type_trash',
@@ -64,7 +95,7 @@ const NewsCard = ({
               {
                 isSearchResults
                   ? currentUser.isLoggedIn
-                    ? isBookmarked
+                    ? savedArticleId
                       ? 'Remove from saved'
                       : 'Save article'
                     : 'Sign in to save articles'
@@ -75,25 +106,29 @@ const NewsCard = ({
         </div>
 
         <a
-          href={cardData.link}
+          href={data.link}
           target="_blank"
           rel="noreferrer"
           className="news-card__content-container"
         >
           <p className="news-card__date">
-            {cardData.date}
+            {new Date(data.date).toLocaleString('en-US', {
+              day: 'numeric',
+              month: 'long',
+              year: 'numeric',
+            })}
           </p>
 
-          <h3 className="news-card__title">
-            {cardData.title}
+          <h3 className="news-card__title" title={data.title}>
+            {data.title}
           </h3>
 
           <p className="news-card__text">
-            {cardData.text}
+            {data.text}
           </p>
 
           <p className="news-card__source">
-            {cardData.source}
+            {data.source}
           </p>
         </a>
       </div>
